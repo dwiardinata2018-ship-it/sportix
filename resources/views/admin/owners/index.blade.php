@@ -1,481 +1,383 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Kelola Owner - SPORTIX</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #f4f7f5;
-            color: #26352c;
-        }
-
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background: #176b3a;
-            color: white;
-            position: fixed;
-            left: 0;
-            top: 0;
-            padding: 25px 18px;
-        }
-
-        .brand {
-            font-size: 23px;
-            font-weight: bold;
-            margin-bottom: 35px;
-            padding-left: 10px;
-        }
-
-        .menu-title {
-            font-size: 11px;
-            color: #b9ddc6;
-            margin: 20px 10px 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sidebar a {
-            display: block;
-            color: #e4f1e8;
-            text-decoration: none;
-            padding: 12px 13px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: #ffffff;
-            color: #176b3a;
-        }
-
-        .main {
-            margin-left: 250px;
-            padding: 30px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .topbar h2 {
-            font-size: 22px;
-        }
-
-        .admin-info {
-            font-size: 13px;
-            color: #68776d;
-        }
-
-        .description {
-            color: #78847c;
-            font-size: 14px;
-            margin-top: 7px;
-            margin-bottom: 25px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 11px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.03);
-        }
-
-        .stat-card p {
-            color: #78847c;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card h3 {
-            font-size: 25px;
-            color: #176b3a;
-        }
-
-        .content-card {
-            background: white;
-            padding: 23px;
-            border-radius: 11px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.03);
-        }
-
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .content-header h3 {
-            font-size: 18px;
-        }
-
-        .search-form {
-            display: flex;
-            gap: 8px;
-        }
-
-        .search-form input {
-            padding: 10px 13px;
-            border: 1px solid #dce4de;
-            border-radius: 7px;
-            outline: none;
-            width: 230px;
-        }
-
-        .search-form button {
-            padding: 10px 17px;
-            background: #176b3a;
-            color: white;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 15px 12px;
-            border-bottom: 1px solid #edf0ed;
-            font-size: 13px;
-            white-space: nowrap;
-        }
-
-        th {
-            background: #f8faf8;
-            color: #68776d;
-            font-weight: 600;
-        }
-
-        td {
-            color: #435047;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .active {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .inactive {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .verified {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .unverified {
-            background: #e5e7eb;
-            color: #4b5563;
-        }
-
-        .detail-button {
-            display: inline-block;
-            text-decoration: none;
-            padding: 8px 13px;
-            background: #e5eee8;
-            color: #176b3a;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 30px;
-            color: #78847c;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            color: #166534;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .pagination {
-            margin-top: 20px;
-        }
-
-        @media (max-width: 1100px) {
-            .stats {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 700px) {
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 20px 15px;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .search-form input {
-                width: 180px;
-            }
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<body class="bg-neu-base text-neu-dark antialiased selection:bg-neu-primary selection:text-white">
 
-<body>
+    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-col lg:flex-row">
 
-    <aside class="sidebar">
-
-        <div class="brand">SPORTIX.</div>
-
-        <div class="menu-title">Main Menu</div>
-
-        <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-        <a href="{{ route('admin.users.index') }}">Kelola Pengguna</a>
-        <a href="{{ route('admin.owners.index') }}" class="active">Kelola Owner</a>
-        <a href="#">Kelola Lapangan</a>
-        <a href="#">Monitoring Booking</a>
-        <a href="#">Ulasan</a>
-
-        <div class="menu-title">System</div>
-
-        <a href="#">Log Aktivitas</a>
-        <a href="#">Pengaturan</a>
-
-    </aside>
-
-    <main class="main">
-
-        <div class="topbar">
-            <h2>Kelola Owner</h2>
-
-            <div class="admin-info">
-                Administrator Sportix · Administrator
-            </div>
+        <!-- Overlay Mobile Sidebar -->
+        <div x-show="sidebarOpen"
+             @click="sidebarOpen = false"
+             x-transition.opacity
+             class="fixed inset-0 z-30 bg-neu-dark/30 backdrop-blur-xs lg:hidden"
+             style="display: none;">
         </div>
 
-        <p class="description">
-            Kelola akun pemilik lapangan, profil usaha, dan status verifikasi Owner Sportix.
-        </p>
+        <!-- SIDEBAR ADMIN (Neumorphism) -->
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+               class="fixed inset-y-0 left-0 z-40 w-72 bg-neu-base p-6 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:shrink-0 flex flex-col justify-between border-r border-neu-muted/15">
 
-        @if (session('success'))
-            <div class="success-message">
-                {{ session('success') }}
+            <div>
+                <!-- Logo & Badge Admin -->
+                <div class="flex items-center justify-between mb-8 px-2">
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="text-3xl font-extrabold tracking-tight text-neu-primary drop-shadow-sm">
+                        SPORTIX<span class="text-neu-muted">.</span>
+                    </a>
+                    <span class="rounded-full bg-neu-base shadow-neu-inset px-3 py-1 text-[11px] font-extrabold text-neu-primary uppercase tracking-wider">
+                        Admin
+                    </span>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <p class="px-4 mb-3 text-[11px] font-extrabold uppercase tracking-widest text-neu-muted">
+                        Main Menu
+                    </p>
+                    <nav class="space-y-2.5">
+                        <a href="{{ route('admin.dashboard') }}"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            Dashboard
+                        </a>
+
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            Kelola Pengguna
+                        </a>
+
+                        <a href="{{ route('admin.owners.index') }}"
+                           class="flex items-center gap-3 rounded-full bg-neu-base shadow-neu-raised px-5 py-3 text-sm font-extrabold text-neu-primary transition-all duration-300">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                            Kelola Owner
+                        </a>
+
+                        <a href="#"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                            </svg>
+                            Kelola Lapangan
+                        </a>
+
+                        <a href="#"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            Monitoring Booking
+                        </a>
+
+                        <a href="#"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                            Ulasan
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- System Menu -->
+                <div>
+                    <p class="px-4 mb-3 text-[11px] font-extrabold uppercase tracking-widest text-neu-muted">
+                        System
+                    </p>
+                    <nav class="space-y-2.5">
+                        <a href="#"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Log Aktivitas
+                        </a>
+
+                        <a href="#"
+                           class="flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold text-neu-dark transition-all duration-300 hover:shadow-neu-inset hover:text-neu-primary">
+                            <svg class="w-5 h-5 shrink-0 text-neu-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Pengaturan
+                        </a>
+                    </nav>
+                </div>
             </div>
-        @endif
 
-        <section class="stats">
-
-            <div class="stat-card">
-                <p>Total Owner</p>
-                <h3>{{ $totalOwners }}</h3>
+            <!-- Footer Sidebar Info -->
+            <div class="mt-8 rounded-[20px] bg-neu-base shadow-neu-inset p-4 text-center">
+                <p class="text-xs font-extrabold text-neu-dark">Sportix Admin Panel</p>
+                <p class="mt-0.5 text-[11px] font-medium text-neu-muted">Platform Management System</p>
             </div>
+        </aside>
 
-            <div class="stat-card">
-                <p>Owner Aktif</p>
-                <h3>{{ $activeOwners }}</h3>
-            </div>
+        <!-- MAIN AREA -->
+        <div class="flex-1 flex flex-col min-w-0">
 
-            <div class="stat-card">
-                <p>Owner Nonaktif</p>
-                <h3>{{ $inactiveOwners }}</h3>
-            </div>
+            <!-- TOPBAR -->
+            <header class="bg-neu-base px-6 py-5 sm:px-8 border-b border-neu-muted/15">
+                <div class="flex items-center justify-between gap-4">
 
-            <div class="stat-card">
-                <p>Profil Terverifikasi</p>
-                <h3>{{ $verifiedOwners }}</h3>
-            </div>
+                    <div class="flex items-center gap-3">
+                        <!-- Tombol Hamburger Mobile -->
+                        <button @click="sidebarOpen = !sidebarOpen"
+                                class="inline-flex lg:hidden items-center justify-center h-11 w-11 rounded-full bg-neu-base shadow-neu-raised text-neu-dark hover:shadow-neu-pressed transition-all duration-300 focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
 
-            <div class="stat-card">
-                <p>Menunggu Verifikasi</p>
-                <h3>{{ $pendingOwners }}</h3>
-            </div>
+                        <h2 class="text-xl font-extrabold text-neu-dark tracking-tight">
+                            Kelola Owner
+                        </h2>
+                    </div>
 
-        </section>
+                    <div class="flex items-center gap-3">
+                        <div class="hidden sm:inline-flex items-center gap-2 rounded-full bg-neu-base shadow-neu-inset px-4 py-2.5 text-xs font-extrabold text-neu-dark">
+                            <span>{{ auth()->user()->name ?? 'Administrator Sportix' }}</span>
+                            <span class="text-neu-muted">·</span>
+                            <span class="text-neu-primary">Administrator</span>
+                        </div>
 
-        <section class="content-card">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-full bg-neu-base shadow-neu-raised px-5 py-2.5 text-xs font-extrabold text-red-500 transition-all duration-300 hover:shadow-neu-pressed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </div>
 
-            <div class="content-header">
+                </div>
+            </header>
 
-                <h3>Daftar Owner</h3>
+            <!-- CONTENT -->
+            <main class="flex-1 p-6 sm:p-8 lg:p-10">
+                <div class="mx-auto max-w-7xl">
 
-                <form action="{{ route('admin.owners.index') }}"
-                      method="GET"
-                      class="search-form">
+                    <!-- Header Halaman -->
+                    <div class="mb-10">
+                        <h1 class="text-3xl sm:text-4xl font-extrabold text-neu-dark tracking-tight">
+                            Manajemen Owner
+                        </h1>
+                        <p class="mt-2 text-base font-medium text-neu-muted">
+                            Kelola akun pemilik lapangan, profil usaha, dan status verifikasi Owner Sportix.
+                        </p>
+                    </div>
 
-                    <input
-                        type="text"
-                        name="search"
-                        placeholder="Cari nama, email, telepon..."
-                        value="{{ $search }}"
-                    >
+                    <!-- Alert Success -->
+                    @if (session('success'))
+                        <div class="mb-8 rounded-[20px] bg-neu-base shadow-neu-inset p-5 border border-green-500/30 flex items-center gap-3">
+                            <svg class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-extrabold text-green-600">{{ session('success') }}</p>
+                        </div>
+                    @endif
 
-                    <button type="submit">Cari</button>
+                    <!-- Statistik Owner (5 Kartu Responsif) -->
+                    <section class="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 
-                </form>
+                        <!-- Total Owner -->
+                        <div class="rounded-[24px] bg-neu-base p-5 shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover">
+                            <p class="text-xs font-bold uppercase tracking-wider text-neu-muted">Total Owner</p>
+                            <h3 class="mt-2 text-3xl font-extrabold text-neu-primary">
+                                {{ $totalOwners }}
+                            </h3>
+                        </div>
 
-            </div>
+                        <!-- Owner Aktif -->
+                        <div class="rounded-[24px] bg-neu-base p-5 shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover">
+                            <p class="text-xs font-bold uppercase tracking-wider text-neu-muted">Owner Aktif</p>
+                            <h3 class="mt-2 text-3xl font-extrabold text-green-600">
+                                {{ $activeOwners }}
+                            </h3>
+                        </div>
 
-            <div class="table-wrapper">
+                        <!-- Owner Nonaktif -->
+                        <div class="rounded-[24px] bg-neu-base p-5 shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover">
+                            <p class="text-xs font-bold uppercase tracking-wider text-neu-muted">Owner Nonaktif</p>
+                            <h3 class="mt-2 text-3xl font-extrabold text-red-500">
+                                {{ $inactiveOwners }}
+                            </h3>
+                        </div>
 
-                <table>
+                        <!-- Profil Terverifikasi -->
+                        <div class="rounded-[24px] bg-neu-base p-5 shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover">
+                            <p class="text-xs font-bold uppercase tracking-wider text-neu-muted">Profil Terverifikasi</p>
+                            <h3 class="mt-2 text-3xl font-extrabold text-neu-primary">
+                                {{ $verifiedOwners }}
+                            </h3>
+                        </div>
 
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Nama Owner</th>
-                            <th>Email</th>
-                            <th>Nomor Telepon</th>
-                            <th>Nama Usaha</th>
-                            <th>Verifikasi Profil</th>
-                            <th>Jumlah Lapangan</th>
-                            <th>Status Akun</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+                        <!-- Menunggu Verifikasi -->
+                        <div class="rounded-[24px] bg-neu-base p-5 shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover">
+                            <p class="text-xs font-bold uppercase tracking-wider text-neu-muted">Menunggu Verifikasi</p>
+                            <h3 class="mt-2 text-3xl font-extrabold text-amber-500">
+                                {{ $pendingOwners }}
+                            </h3>
+                        </div>
 
-                    <tbody>
+                    </section>
 
-                        @forelse ($owners as $owner)
+                    <!-- Panel Daftar Owner -->
+                    <section class="rounded-[28px] bg-neu-base p-6 sm:p-8 shadow-neu-raised">
 
-                            <tr>
+                        <!-- Header & Form Pencarian -->
+                        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <h3 class="text-xl font-extrabold text-neu-dark">
+                                Daftar Owner
+                            </h3>
 
-                                <td>{{ $owners->firstItem() + $loop->index }}</td>
+                            <form action="{{ route('admin.owners.index') }}"
+                                  method="GET"
+                                  class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
 
-                                <td>{{ $owner->name }}</td>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Cari nama, email, telepon..."
+                                    value="{{ $search }}"
+                                    class="flex-1 sm:w-72 rounded-full border-none bg-neu-base shadow-neu-inset px-5 py-3 text-sm font-bold text-neu-dark placeholder-neu-muted focus:ring-0 focus:shadow-neu-pressed transition-all outline-none"
+                                >
 
-                                <td>{{ $owner->email }}</td>
+                                <button type="submit"
+                                        class="rounded-full bg-neu-primary px-6 py-3 text-xs font-extrabold text-white shadow-neu-raised transition-all duration-300 hover:shadow-neu-hover active:shadow-neu-pressed active:bg-neu-primary-dark">
+                                    Cari
+                                </button>
 
-                                <td>{{ $owner->phone ?: '-' }}</td>
-
-                                <td>
-                                    {{ $owner->ownerProfile?->business_name ?: 'Belum melengkapi profil' }}
-                                </td>
-
-                                <td>
-
-                                    @if (!$owner->ownerProfile)
-                                        <span class="badge unverified">
-                                            Belum ada profil
-                                        </span>
-
-                                    @elseif ($owner->ownerProfile->verification_status === 'verified')
-                                        <span class="badge verified">
-                                            Terverifikasi
-                                        </span>
-
-                                    @elseif ($owner->ownerProfile->verification_status === 'pending')
-                                        <span class="badge pending">
-                                            Menunggu
-                                        </span>
-
-                                    @else
-                                        <span class="badge unverified">
-                                            {{ ucfirst($owner->ownerProfile->verification_status) }}
-                                        </span>
-                                    @endif
-
-                                </td>
-
-                                <td>{{ $owner->venues_count }} Lapangan</td>
-
-                                <td>
-
-                                    @if ($owner->account_status === 'active')
-                                        <span class="badge active">Aktif</span>
-                                    @else
-                                        <span class="badge inactive">Nonaktif</span>
-                                    @endif
-
-                                </td>
-
-                                <td>
-                                   <a href="{{ route('admin.owners.show', $owner->id) }}" class="detail-button">
-                                        Detail
+                                @if($search)
+                                    <a href="{{ route('admin.owners.index') }}"
+                                       class="rounded-full bg-neu-base shadow-neu-raised px-5 py-3 text-xs font-extrabold text-neu-muted transition-all duration-300 hover:shadow-neu-pressed hover:text-neu-dark">
+                                        Reset
                                     </a>
-                                </td>
+                                @endif
+                            </form>
+                        </div>
 
-                            </tr>
+                        <!-- Tabel Daftar Owner -->
+                        <div class="overflow-x-auto rounded-[20px] bg-neu-base shadow-neu-inset p-2 sm:p-4">
+                            <table class="w-full min-w-[980px] text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-neu-muted/20 text-[11px] font-extrabold uppercase tracking-wider text-neu-muted">
+                                        <th class="py-3.5 px-4">No.</th>
+                                        <th class="py-3.5 px-4">Nama Owner</th>
+                                        <th class="py-3.5 px-4">Email</th>
+                                        <th class="py-3.5 px-4">Nomor Telepon</th>
+                                        <th class="py-3.5 px-4">Nama Usaha</th>
+                                        <th class="py-3.5 px-4">Verifikasi Profil</th>
+                                        <th class="py-3.5 px-4">Jumlah Lapangan</th>
+                                        <th class="py-3.5 px-4">Status Akun</th>
+                                        <th class="py-3.5 px-4 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
 
-                        @empty
+                                <tbody class="divide-y divide-neu-muted/15 text-sm">
+                                    @forelse ($owners as $owner)
+                                        <tr class="transition-colors hover:bg-white/20">
+                                            <td class="py-4 px-4 font-extrabold text-neu-muted">
+                                                {{ $owners->firstItem() + $loop->index }}
+                                            </td>
 
-                            <tr>
-                                <td colspan="9" class="empty">
-                                    Tidak ada data Owner yang ditemukan.
-                                </td>
-                            </tr>
+                                            <td class="py-4 px-4 font-extrabold text-neu-dark whitespace-nowrap">
+                                                {{ $owner->name }}
+                                            </td>
 
-                        @endforelse
+                                            <td class="py-4 px-4 font-medium text-neu-dark whitespace-nowrap">
+                                                {{ $owner->email }}
+                                            </td>
 
-                    </tbody>
+                                            <td class="py-4 px-4 font-medium text-neu-muted whitespace-nowrap">
+                                                {{ $owner->phone ?: '-' }}
+                                            </td>
 
-                </table>
+                                            <td class="py-4 px-4 font-bold text-neu-dark whitespace-nowrap">
+                                                {{ $owner->ownerProfile?->business_name ?: 'Belum melengkapi profil' }}
+                                            </td>
 
-            </div>
+                                            <td class="py-4 px-4 whitespace-nowrap">
+                                                @if (!$owner->ownerProfile)
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-neu-muted uppercase tracking-wider">
+                                                        Belum ada profil
+                                                    </span>
+                                                @elseif ($owner->ownerProfile->verification_status === 'verified')
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-green-600 uppercase tracking-wider">
+                                                        Terverifikasi
+                                                    </span>
+                                                @elseif ($owner->ownerProfile->verification_status === 'pending')
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-amber-500 uppercase tracking-wider">
+                                                        Menunggu
+                                                    </span>
+                                                @else
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-red-500 uppercase tracking-wider">
+                                                        {{ ucfirst($owner->ownerProfile->verification_status) }}
+                                                    </span>
+                                                @endif
+                                            </td>
 
-            <div class="pagination">
-                {{ $owners->links() }}
-            </div>
+                                            <td class="py-4 px-4 font-extrabold text-neu-primary whitespace-nowrap">
+                                                {{ $owner->venues_count }} Lapangan
+                                            </td>
 
-        </section>
+                                            <td class="py-4 px-4 whitespace-nowrap">
+                                                @if ($owner->account_status === 'active')
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-green-600 uppercase tracking-wider">
+                                                        Aktif
+                                                    </span>
+                                                @else
+                                                    <span class="inline-block rounded-full bg-neu-base shadow-neu-raised px-3.5 py-1 text-[11px] font-extrabold text-red-500 uppercase tracking-wider">
+                                                        Nonaktif
+                                                    </span>
+                                                @endif
+                                            </td>
 
-    </main>
+                                            <td class="py-4 px-4 text-right whitespace-nowrap">
+                                                <a href="{{ route('admin.owners.show', $owner->id) }}"
+                                                   class="inline-block rounded-full bg-neu-base shadow-neu-raised px-4 py-2 text-xs font-extrabold text-neu-primary transition-all duration-300 hover:shadow-neu-pressed">
+                                                    Detail
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                                    @empty
+                                        <tr>
+                                            <td colspan="9" class="py-12 px-4 text-center text-sm font-bold text-neu-muted">
+                                                Tidak ada data Owner yang ditemukan.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-6">
+                            {{ $owners->links() }}
+                        </div>
+
+                    </section>
+
+                </div>
+            </main>
+
+        </div>
+    </div>
 
 </body>
 </html>

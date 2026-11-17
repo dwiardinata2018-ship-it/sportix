@@ -1,123 +1,103 @@
-
-<nav x-data="{ open: false }" class="bg-white border-b border-slate-200 shadow-sm">
+<nav x-data="{ open: false }" class="bg-neu-base pt-6 pb-4">
     <!-- Navbar Utama -->
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 justify-between">
+        <div class="flex items-center justify-between">
 
-            <!-- Logo Sportix -->
+            <!-- 1. KIRI (Garis Ungu): Logo Sportix -->
             <div class="flex items-center">
                 <a href="{{ route('user.dashboard') }}"
-                   class="text-2xl font-extrabold tracking-tight text-blue-600">
-                    SPORTIX<span class="text-slate-800">.</span>
+                   class="text-3xl font-extrabold tracking-tight text-neu-primary drop-shadow-sm">
+                    SPORTIX<span class="text-neu-muted">.</span>
                 </a>
             </div>
 
-            <!-- Menu Desktop -->
-            <div class="hidden space-x-8 sm:flex sm:items-center">
+            <!-- 2. TENGAH (Lingkaran Hitam): Menu Desktop (Gaya TABS UI Kit) -->
+            <div class="hidden sm:flex sm:items-center">
+                <!-- Inset Container untuk Tabs -->
+                <div class="flex items-center space-x-2 bg-neu-base shadow-neu-inset rounded-full p-1.5">
+                    
+                    <a href="{{ route('user.dashboard') }}"
+                       class="{{ request()->routeIs('user.dashboard') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark hover:text-neu-primary' }} px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300">
+                        Home
+                    </a>
 
-                <x-nav-link
-                    :href="route('user.dashboard')"
-                    :active="request()->routeIs('user.dashboard')">
-                    Home
-                </x-nav-link>
+                    <a href="{{ route('user.reservation') }}"
+                       class="{{ request()->routeIs('user.reservation') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark hover:text-neu-primary' }} px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300">
+                        Reservation
+                    </a>
 
-                <x-nav-link
-                    :href="route('user.reservation')"
-                    :active="request()->routeIs('user.reservation')">
-                    Reservation
-                </x-nav-link>
+                    <a href="{{ route('user.booking') }}"
+                       class="{{ request()->routeIs('user.booking') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark hover:text-neu-primary' }} px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300">
+                        Booking
+                    </a>
 
-                <x-nav-link
-                    :href="route('user.booking')"
-                    :active="request()->routeIs('user.booking')">
-                    Booking
-                </x-nav-link>
+                    <a href="{{ route('user.activity') }}"
+                       class="{{ request()->routeIs('user.activity') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark hover:text-neu-primary' }} px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300">
+                        Activity
+                    </a>
 
-                <x-nav-link
-                    :href="route('user.activity')"
-                    :active="request()->routeIs('user.activity')">
-                    Activity
-                </x-nav-link>
+                    <a href="{{ route('user.notifications') }}"
+                       class="{{ request()->routeIs('user.notifications') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark hover:text-neu-primary' }} flex items-center px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300">
+                        Notifikasi
+                        @if ($unreadNotificationCount > 0)
+                            <span class="ms-2 rounded-full bg-neu-primary px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+                                {{ $unreadNotificationCount }}
+                            </span>
+                        @endif
+                    </a>
 
-                <x-nav-link
-                    :href="route('user.notifications')"
-                    :active="request()->routeIs('user.notifications')">
-                    Notifikasi
-
-                    @if ($unreadNotificationCount > 0)
-                        <span class="ms-2 rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
-                            {{ $unreadNotificationCount }}
-                        </span>
-                    @endif
-                </x-nav-link>
-
+                </div>
             </div>
 
-            <!-- Dropdown Profile Desktop -->
-            <div class="hidden sm:ms-6 sm:flex sm:items-center">
+            <!-- 3. KANAN (Garis Merah & Profil): Tombol Logout & Dropdown Profile Desktop -->
+            <div class="hidden sm:flex sm:items-center sm:space-x-3">
+                
+                <!-- Tombol Logout Langsung di Kiri Profil (Posisi Garis Merah) -->
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-neu-base shadow-neu-raised text-red-500 transition-all duration-300 hover:shadow-neu-hover active:shadow-neu-pressed focus:outline-none" title="Logout">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </button>
+                </form>
+
+                <!-- Dropdown Profile -->
                 <x-dropdown align="right" width="48">
-
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:text-blue-600">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-2">
-                                <svg class="h-4 w-4 fill-current"
-                                     xmlns="http://www.w3.org/2000/svg"
-                                     viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                          clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                        <button class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-neu-base shadow-neu-raised text-neu-dark transition-all duration-300 hover:shadow-neu-hover active:shadow-neu-pressed focus:outline-none">
+                            <!-- Icon Avatar Placeholder -->
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </button>
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            Profile
-                        </x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <button
-                                type="submit"
-                                class="block w-full px-4 py-2 text-start text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition duration-150 ease-in-out">
-                                Logout
-                            </button>
-                        </form>
+                        <div class="bg-neu-base rounded-2xl shadow-neu-raised p-2 mt-2 ring-0 border-0">
+                            <div class="px-4 py-2 border-b border-neu-muted/20 mb-2">
+                                <p class="text-sm font-bold text-neu-dark">{{ Auth::user()->name }}</p>
+                            </div>
+                            <a href="{{ route('profile.edit') }}"
+                               class="block w-full px-4 py-2 text-start text-sm font-bold text-neu-dark rounded-xl hover:shadow-neu-inset transition-all duration-300 mb-1">
+                                Profile
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                        class="block w-full px-4 py-2 text-start text-sm font-bold text-red-500 rounded-xl hover:shadow-neu-inset transition-all duration-300">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </x-slot>
-
                 </x-dropdown>
             </div>
 
             <!-- Tombol Menu Mobile -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button
-                    @click="open = ! open"
-                    class="inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-blue-600">
-
-                    <svg class="h-6 w-6"
-                         stroke="currentColor"
-                         fill="none"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            :class="{ 'hidden': open, 'inline-flex': ! open }"
-                            class="inline-flex"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-
-                        <path
-                            :class="{ 'hidden': ! open, 'inline-flex': open }"
-                            class="hidden"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
+                <button @click="open = ! open"
+                        class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-neu-base shadow-neu-raised text-neu-dark hover:shadow-neu-pressed transition-all duration-300 focus:outline-none">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path :class="{ 'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -126,80 +106,20 @@
     </div>
 
     <!-- Menu Mobile -->
-    <div :class="{ 'block': open, 'hidden': ! open }"
-         class="hidden sm:hidden">
-
-        <div class="space-y-1 pb-3 pt-2">
-
-            <x-responsive-nav-link
-                :href="route('user.dashboard')"
-                :active="request()->routeIs('user.dashboard')">
-                Home
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link
-                :href="route('user.reservation')"
-                :active="request()->routeIs('user.reservation')">
-                Reservation
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link
-                :href="route('user.booking')"
-                :active="request()->routeIs('user.booking')">
-                Booking
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link
-                :href="route('user.activity')"
-                :active="request()->routeIs('user.activity')">
-                Activity
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link
-                :href="route('user.notifications')"
-                :active="request()->routeIs('user.notifications')">
-                Notifikasi
-
-                @if ($unreadNotificationCount > 0)
-                    <span class="ms-2 rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
-                        {{ $unreadNotificationCount }}
-                    </span>
-                @endif
-            </x-responsive-nav-link>
-
-        </div>
-
-        <!-- Informasi User Mobile -->
-        <div class="border-t border-slate-200 pb-1 pt-4">
-
-            <div class="px-4">
-                <div class="text-base font-medium text-slate-800">
-                    {{ Auth::user()->name }}
-                </div>
-
-                <div class="text-sm font-medium text-slate-500">
-                    {{ Auth::user()->email }}
-                </div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    Profile
-                </x-responsive-nav-link>
-
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-
-                <button
-                    type="submit"
-                    class="block w-full px-4 py-2 text-start text-sm leading-5 text-slate-700 hover:bg-slate-100 hover:text-blue-600 focus:bg-slate-100 transition duration-150 ease-in-out">
-                    Logout
-                </button>
-            </form>
-
+    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden sm:hidden bg-neu-base mt-6 px-4">
+        <div class="bg-neu-base shadow-neu-inset rounded-3xl p-4 space-y-2">
+            <a href="{{ route('user.dashboard') }}" class="{{ request()->routeIs('user.dashboard') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark' }} block w-full px-5 py-3 rounded-full font-bold transition-all duration-300">Home</a>
+            <a href="{{ route('user.reservation') }}" class="{{ request()->routeIs('user.reservation') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark' }} block w-full px-5 py-3 rounded-full font-bold transition-all duration-300">Reservation</a>
+            <a href="{{ route('user.booking') }}" class="{{ request()->routeIs('user.booking') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark' }} block w-full px-5 py-3 rounded-full font-bold transition-all duration-300">Booking</a>
+            <a href="{{ route('user.activity') }}" class="{{ request()->routeIs('user.activity') ? 'bg-neu-base shadow-neu-raised text-neu-primary' : 'text-neu-dark' }} block w-full px-5 py-3 rounded-full font-bold transition-all duration-300">Activity</a>
+            
+            <div class="border-t border-neu-muted/20 my-2 pt-2">
+                <a href="{{ route('profile.edit') }}" class="block w-full px-5 py-3 text-start font-bold text-neu-dark hover:text-neu-primary transition-all duration-300">Profile</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="block w-full px-5 py-3 text-start font-bold text-red-500 transition-all duration-300">Logout</button>
+                </form>
             </div>
         </div>
-
     </div>
 </nav>

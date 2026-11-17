@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-neu-base text-neu-dark antialiased;
+    }
+}
+
+/* Utilitas tambahan jika dibutuhkan untuk menghapus default ring pada form input Laravel */
+@layer utilities {
+    .neu-input {
+        @apply bg-neu-base border-none shadow-neu-inset focus:ring-0 focus:shadow-neu-pressed transition-shadow duration-300 rounded-xl;
+    }
+    
+    .neu-button {
+        @apply bg-neu-base shadow-neu-raised hover:shadow-neu-hover active:shadow-neu-pressed transition-shadow duration-300 rounded-xl font-semibold;
+    }
+}
